@@ -123,28 +123,146 @@
 
         <h2 id="data">Data</h2>
 
-        <p>Include some detailed information about the dataset here. You should <a href="#">add a link</a> to the original dataset. You might also want to quote the license:</p>
-
-        <blockquote>
           <p>
-            "This data is made available under the Public Domain Dedication and License v1.0 whose full text can be found at: <a href="http://www.opendatacommons.org/licenses/pddl/1.0/">www.opendatacommons.org/licenses/pddl/1.0/</a>"
+            This dataset reports baseline estimates of parents’ and children’s income distributions by college. The college-level values are calculated as means over students in the 1980, 1981 and 1982 birth cohorts. When data for a college from any of these cohorts are incomplete, we use data from 1983 and 1984 cohorts to obtain an estimate.
           </p>
-          <cite>Put a citation here, possibly link to the dataset license information directly.</cite>
-        </blockquote>
 
-        <p>In addition to including a link to the source and license, you should describe the data. You might want a list of some sort to enumerate the different types of columns:</p>
+          <p>
+            In some cases, multiple colleges share a single identifier in the tax records (e.g., the campuses of the University of Massachusetts or University of Illinois systems). In these cases (denoted by multi = 1 in the dataset), we report averages over all students attending the relevant group of colleges. For these groups of colleges, we assign locations based on the location of the largest school/campus with the group of colleges.
+          </p>
 
-        <ol>
-          <li><strong>Column Name:</strong> Give a description of the column, including its type and possible range of values.</li>
+          <blockquote>
+            <p>
+              "This data is made publicly available under the Opportunity Insights whose full text can be found at: <a href="https://opportunityinsights.org/data">https://opportunityinsights.org/data</a>"
+            </p>
+            <cite>Data acquired from <a href="https://opportunityinsights.org/data" target="_blank">https://opportunityinsights.org/data</a> on February 21 2020. Aggregated data on this page is made publicly available under Opportunity Insights(<a href="https://opportunityinsights.org/data">https://opportunityinsights.org/data</a>)</cite>
+          </blockquote>
 
-          <li><strong>Column Name:</strong> Give a description of the column, including its type and possible range of values.</li>
+          <p>The dataset has following columns:</p>
 
-          <li><strong>Column Name:</strong> Give a description of the column, including its type and possible range of values.</li>
+          <ol>
+            <li><strong>super_opeid:</strong> Institution OPEID / Cluster ID when combining multiple
+              OPEIDs:
+              -99 = late goers (attended college between 23-28)
+              -9 = Never attended college (up to and including
+              year 2013)
+              -1 = attending a college with insufficient data (less
+              than 100 students on average or incomplete data)
+              >0 = specific colleges</li>
 
-          <li><strong>Column Name:</strong> Give a description of the column, including its type and possible range of values.</li>
-        </ol>
+            <li><strong>name:</strong> Name of college (or college group)</li>
 
-        <p>This will of course differ depending on the assignment and data.</p>
+            <li><strong>type:</strong> Type :
+              1 = public
+              2 = private non-profit
+              3 = for-profit</li>
+
+            <li><strong>tier:</strong> Selectivity and type combination (see Table 6 for more
+              detailed descriptions of these groups):
+              1 = Ivy Plus
+              2 = Other elite schools (public and private)
+              3 = Highly selective public
+              4 = Highly selective private
+              5 = Selective public
+              6 = Selective private
+              7 = Nonselective 4-year public
+              8 = Nonselective 4-year private not-for-profit
+              9 = Two-year (public and private not-for-profit)
+              10 = Four-year for-profit
+              11 = Two-year for-profit
+              12 = Less than two year schools of any type
+              13 = Attending college with insufficient data
+              14 = Not in college between the ages of 19-22</li>
+
+            <li><strong>tier_name:</strong> Name of college tier</li>
+
+            <li><strong>iclevel:</strong> Four-year or two-year college
+              1 = Four-year
+              2 = Two-year
+              3 = Less than Two-year</li>
+
+            <li><strong>region:</strong> Census region:
+              1 = Northeast
+              2 = Midwest
+              3 = South
+              4 = West</li>
+
+            <li><strong>state:</strong>State</li>
+
+            <li><strong>cz:</strong> Commuting zone ID</li>
+
+            <li><strong>czname:</strong> Commuting zone name</li>
+
+            <li><strong>cfips:</strong> Combined state and county fips code</li>
+
+            <li><strong>county:</strong> County</li>
+
+            <li><strong>multi:</strong> Indicator that equals 1 if multiple colleges (IPEDS Unit IDs)
+              are grouped in this Super OPEID.</li>
+
+            <li><strong>count:</strong> Average number of kids per cohort</li>
+
+            <li><strong>female:</strong> Fraction female among kids</li>
+
+            <li><strong>k_married:</strong> Fraction of kids married in 2014</li>
+
+            <li><strong>mr_kq5_pq1:</strong> Mobility rate (joint probability of parents in bottom quintile
+              and child in top quintile of the income distribution)</li>
+
+            <li><strong>mr_ktop1_pq1:</strong> Upper-tail mobility rate (joint probability of parents in
+              bottom quintile and child in top 1% of the income
+              distribution).</li>
+
+            <li><strong>par_mean:</strong> Mean parental income</li>
+
+            <li><strong>par_median:</strong> Median parent household income (rounded to nearest
+              $100)</li>
+
+            <li><strong>par_rank:</strong> Mean parental income rank</li>
+
+            <li><strong>par_q[PARQUINT]:</strong> Fraction of parents in an income quintile [PARQUINT]. 1 is
+              the bottom quintile and 5 is the top.</li>
+
+            <li><strong>par_top[PCTILE]pc:</strong> Fraction of parents in the top percentile [PCTILE]. For
+              instance, par_toppt1pc refers to parents in the top 0.1% of
+              the income distribution. </li>
+
+            <li><strong>k_rank:</strong> Mean kid earnings rank</li>
+
+            <li><strong>k_mean:</strong> Mean kid earnings</li>
+
+            <li><strong>k_median:</strong> Median child individual earnings in 2014 (rounded to the
+              nearest $100)</li>
+
+            <li><strong>k_median_nozero:</strong> Median child individual earnings among positive earners in
+              2014 (rounded to the nearest $100).</li>
+
+            <li><strong>k_0inc:</strong> Fraction of kids with zero labor earnings</li>
+
+            <li><strong>k_q[KIDQUINT] :</strong> Fraction of kids in an income quintile [KIDQUINT]. 1 is the
+              bottom quintile and 5 is the top.</li>
+
+            <li><strong>k_top[PCTILE]pc :</strong> Fraction of kids in the top percentile [PCTILE]. For instance,
+              top1pc refers to children in the top 1% of the income
+              distribution. </li>
+
+            <li><strong>k_rank_cond_parq[PARQUINT]:</strong> Mean kid earnings rank conditional on parent in quintile
+              [PARQUINT]</li>
+
+            <li><strong>kq[KIDQUINT]_cond_parq[PARQUINT] :</strong> Probability of kid in quintile [KIDQUINT] conditional on
+              parent in quintile [PARQUINT] </li>
+
+            <li><strong>ktop1pc_cond_parq[PARQUINT] :</strong> Probability of kid in top 1% conditional on parent in quintile
+              [PARQUINT]. </li>
+
+            <li><strong>k_married_cond_parq[PARQUINT] :</strong> Fraction of kids married conditional on parent in quintile
+              [PARQUINT] </li>
+
+            <li><strong>shareimputed :</strong> Share of count-weighted data that was imputed using
+              information from the 1983-84 cohorts </li>
+
+            <li><strong>imputed :</strong> Indicator if any data for that super_opeid was imputed </li>
+          </ol>
 
         <h3 id="wrangling">Wrangling</h3>
 
