@@ -63,11 +63,11 @@
             </a>
 
             <div class="navbar-dropdown">
-              <a class="navbar-item">
-                <span class="icon"><i class="fas fa-chart-line"></i></span>
-                <span>Line Chart</span>
+              <a class="navbar-item" href="#splom">
+                <span class="icon"><i class="fas fa-chart-scatter"></i></span>
+                <span>ScatterPlot Matrix</span>
               </a>
-              <a class="navbar-item">
+<!--               <a class="navbar-item">
                 <span class="icon"><i class="fas fa-chart-area"></i></span>
                 <span>Area Chart</span>
               </a>
@@ -81,7 +81,7 @@
               <a class="navbar-item">
                 <span class="icon"><i class="fas fa-chart-pie"></i></span>
                 <span>Pie Chart</span>
-              </a>
+              </a> -->
             </div>
           </div>
         </div>
@@ -266,87 +266,58 @@
 
         <h3 id="wrangling">Wrangling</h3>
 
-        <p>Perhaps you had to do some data wrangling to the original dataset to prepare it for visualization. This would be a great place to discuss some of that wrangling.
+       <p>The data is filtered on state as "CA"
 
         <pre>
-You can even put code into these pre blocks.
-  It will preserve whitespace.
-    That is helpful for formatted code.
+                  Filtering By:    state = "CA"
+                  Grouping By:     name
+                                   type
+                  Aggregating By:  count(Average)
+                                   mr_kq5_pq1(Average)
+                                   k_median(Average) 
+                                   par_median(Average)
+                                   mr_ktop1_pq1(Average)
         </pre>
-
-        <p>You can alternatively embed a Gist if you want. There is an "embed" button on <a href="https://gist.github.com/octocat/6cad326836d38bd3a7ae">the Gist page</a> and results in something like this:</p>
-
-        <script src="https://gist.github.com/octocat/6cad326836d38bd3a7ae.js"></script>
-
         <h2 id="visualizations">Visualizations</h2>
 
-        <p>Ideally not everything would be on a single page like this example. Instead, you might want to put each section in its own webpage. You would need to carefully replicate the page template (with the header, navbar, and footer) and make the necessary updates. For example, you want the "About" navbar item to be considered active on an "About" web page.</p>
-
-        <p>For now this is just a demo. The buttons below do not go anywhere, but can be easily changed to link to different visualization pages.</p>
-
         <p class="buttons">
-          <a class="button is-large is-success" href="#">
+          <a class="button is-large is-success" id="splom" href="#">
             <span class="icon is-medium">
-              <i class="fas fa-chart-line"></i>
+              <i class="fas fa-chart-scatter"></i>
             </span>
-            <span>Line Chart</span>
-          </a>
-
-          <a class="button is-large is-primary" href="#">
-            <span class="icon is-medium">
-              <i class="fas fa-chart-area"></i>
-            </span>
-            <span>Area Chart</span>
-          </a>
-
-          <a class="button is-large is-info" href="#">
-            <span class="icon is-medium">
-              <i class="fas fa-chart-bar"></i>
-            </span>
-            <span>Bar Chart</span>
-          </a>
-
-          <a class="button is-large is-link" href="#">
-            <span class="icon is-medium">
-              <i class="fas fa-chart-pie"></i>
-            </span>
-            <span>Pie Chart</span>
+            <span>ScatterPlot Matrix</span>
           </a>
         </p>
 
         <!-- https://github.com/vega/vega-embed#basic-example -->
-        <p>It is possible to embed some visualizations directly here too. Here is <a href="https://github.com/vega/vega-embed#basic-example">an example</a> using Vega-Lite:</p>
+        <div id="vis">
+              <a href="#" id="srclink" target="_blank">
+                <img src="scatterplotmatrix.png" alt="ScatterPlot Matrix" id="picture" width="868" height="476" />
+              </a>
+              <p>Please click on image for D3 Visualizations or alternatively click on below link to access the same</p>
+        </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/vega@5.9.0"></script>
-        <script src="https://cdn.jsdelivr.net/npm/vega-lite@4.0.2"></script>
-        <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.2.1"></script>
+        <h4>Interpretation</h4>
 
-        <div id="vis"></div>
+        <p>A scatterplot matrix is a collection of scatterplots organized into a grid (or matrix). Each scatterplot shows the relationship between a pair of variables. You interpret a scatterplot by looking for trends in the data as you go from left to right: If the data show an uphill pattern as you move from left to right, this indicates a positive relationship between X and Y. As the X-values increase (move right), the Y-values tend to increase (move up).</p>
 
-        <script type="text/javascript">
-        var spec = "https://raw.githubusercontent.com/vega/vega/master/docs/examples/bar-chart.vg.json";
-        vegaEmbed('#vis', spec).then(function(result) {
-          // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
-        }).catch(console.error);
-        </script>
+        <h4>Conclusion</h4>
 
-        <h4>Instructions</h4>
-
-        <p>You will likely need to include instructions on how to interpet and use the visualization. In the case above, if you click the three dots <i class="fas fa-ellipsis-h has-text-grey-light	"></i> above it will open a menu where you can either save the visualization to a SVG or PNG, or alternatively open it up in the online Vega Editor.</p>
-
-        <h4>Discussion</h4>
-
-        <p>You may also need other sections, like a discussion section, per-visualization section on data wrangling, and others. Because of the extra content and code visualizations take, it might be worthwhile to break up your pages into one home page and then one page per visualization.</p>
+         <p>The below observations can be drawn from the visualization:<ul>
+                  <li>Rates of bottom-to-top  quintile mobility are highest at certain mid-tier public universities, such as the City University of New York and California State colleges.</li>
+                  <li>Rates of upper-tail (bottom quintile to top 1%) mobility are highest at elite colleges, such as Ivy League universities.</li>
+                </ul>
+         </p>
 
         <span class="heading">Acknowledgements</span>
 
         <p>
-          <a href="#">Link to insiration</a><br/>
-          <a href="#">Link to StackOverflow snippet</a>
+          <a href="https://blockbuilder.org/mbostock/4063663">Scatterplot Matrix Brushing</a><br/>
+          <a href="https://strongriley.github.io/d3/ex/splom.html">Scatterplot Matrix</a>
         </p>
 
         <p class="is-6">
-          <em>Thanks to Person Name for their suggestion to do something with the visualization.</em>
+          <em>Thanks to Sophie Engle for her suggestions on the visualization.</em>
         </p>
 
         <h2 id="grade">Grade</h2>
