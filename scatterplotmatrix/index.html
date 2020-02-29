@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="utf-8">
+
+  <title>Baseline Cross-Sectional Estimates of Child and Parent Income Distributions by College</title>
+  <!-- include d3.js v5 -->
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+
+  <!-- include d3.js modules -->
+  <script src="https://d3js.org/d3-array.v2.min.js"></script>
+
+  <!-- TODO: include stylesheets -->
+  <link href="style.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+  <h2 style="font-weight: normal">The Role of Colleges in Intergenerational Mobility</h2>
+  <!-- TODO: include html elements -->
+  <svg id="main-svg"></svg>
+  <svg id="legend-svg" style="position: absolute;"></svg>
+
+  <p>Nikhil Bhutani</p>
+  <p>Source: <a href="https://opportunityinsights.org/paper/mobilityreportcards/" target="_blank">https://opportunityinsights.org/paper/mobilityreportcards/</p>
+
+  <script type="text/javascript">
+    const svg_width = 960;
+    const svg_height = 500;
+
+    var margin = {
+      top: 10,
+      right: 10,
+      bottom: 40,
+      left: 60
+    };
+
+    var width = svg_width - margin.left - margin.right;
+    var height = svg_height - margin.top - margin.bottom;
+    var padding = 0;
+
+    var n_rows = 5;
+    var n_columns = n_rows;
+
+    var space = {
+      width: (width + padding) / n_columns,
+      height: (height + padding) / n_rows
+    }
+
+    var x = d3.scaleLinear()
+      .range([0, space.width]);
+
+    var y = d3.scaleLinear()
+      .range([space.height, 0]);
+
+    var xAxis = d3.axisBottom()
+      .scale(x)
+      .ticks(5);
+
+    var yAxis = d3.axisLeft()
+      .scale(y)
+      .ticks(5);
+
+    var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    let csv = 'mrc_table2.csv';
+
+    d3.csv(csv, convertRow).then(drawScatterPlotMatrix);
+
+    function convertRow(row, index) {
+      let keep = {}
+
+      keep.name = row.name;
+      keep.state = row.state;
+      keep.type = parseInt(row.type);
+      keep.count = parseInt(row.count);
+      keep.childincome = parseFloat(row.k_median);
+      keep.parentincome = parseFloat(row.par_median);
+      keep.mobility = parseFloat(row.mr_kq5_pq1);
+      keep.uppertailmobility = parseFloat(row.mr_ktop1_pq1);
+
+      return keep;
+    }
+
+    //filter by state CA
+    function drawScatterPlotMatrix(data) {
+      data = data.filter(function(row) {
+        return row['state'] === 'CA';
+      });
+
+      var domainByTrait = {},
+        traits = d3.keys(data[0]).filter(function(d) {
+          return d !== "name" && d !== "state" && d !== "type";
+        }),
+        n = traits.length;
+
+      console.log(data);
+      console.log(traits);
+
+      traits.forEach(function(trait) {
+        domainByTrait[trait] = d3.extent(data, function(d) {
+          return d[trait];
+        });
+      });
+
+      console.log(domainByTrait);
+
+      xAxis.tickSize(space.height * n);
+      yAxis.tickSize(-space.width * n);
+
+      xAxis.tickFormat(countFormatter);
+      yAxis.tickFormat(countFormatter);
+
+      var brush = d3.brush()
+        .on("start", brushstart)
+        .on("brush", brushmove)
+        .on("end", brushend)
+        .extent([
+          [0, 0],
+          [space.width, space.height]
+        ]);
+
+      console.log(n);
+
+      var svg = d3.select("body").select('#main-svg')
+        .attr("width", svg_width)
+        .attr("height", svg_height)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      svg.selectAll(".x.axis")
+        .data(traits)
+        .enter().append("g")
+        .attr("class", "x axis")
+        .attr("transform", function(d, i) {
+          return "translate(" + i * space.width + ",0)";
+        })
+        .each(function(d) {
+          x.domain(domainByTrait[d]);
+          d3.select(this).call(xAxis);
+        });
+
+      svg.selectAll(".y.axis")
+        .data(traits)
+        .enter().append("g")
+        .attr("class", "y axis")
+        .attr("transform", function(d, i) {
+          return "translate(0," + i * space.height + ")";
+        })
+        .each(function(d) {
+          y.domain(domainByTrait[d]);
+          d3.select(this).call(yAxis);
+        });
+
+      svg.selectAll(".y.axis")
+        .selectAll(".tick text")
+        .attr("x", 3)
+        .attr("dx", "-0.71em");
+
+      var cell = svg.selectAll(".cell")
+        .data(cross(traits, traits))
+        .enter().append("g")
+        .attr("class", "cell")
+        .attr("transform", function(d) {
+          return "translate(" + d.i * space.width + "," + d.j * space.height + ")";
+        })
+        .each(plot);
+
+      // Titles for the diagonal.
+      cell.filter(function(d) {
+          return d.i === 0;
+        }).append("text")
+        .attr("class", "text")
+        .attr("x", -margin.top)
+        .attr("y", -margin.left)
+        .attr("transform", "rotate(-90)")
+        .attr('text-anchor', 'end')
+        .attr("dy", ".71em")
+        .attr("dx", ".71em")
+        .text(function(d) {
+          var title = "";
+          switch (d.y) {
+            case "count":
+              title = "Average Children per Cohort";
+              break;
+            case "childincome":
+              title = "Median Child Individual Earnings";
+              break;
+            case "parentincome":
+              title = "Median Parent HouseHold Income";
+              break;
+            case "mobility":
+              title = "Mobility Rate";
+              break;
+            case "uppertailmobility":
+              title = "Upper-tail Mobility Rate";
+              break;
+            default:
+              break;
+
+          }
+          return title;
+        });
+
+      cell.filter(function(d) {
+          return d.j === 0;
+        }).append("text")
+        .attr("class", "text")
+        .attr("x", space.height)
+        .attr("y", svg_height - margin.bottom)
+        .attr('text-anchor', 'middle')
+        .attr("dy", "1.5em")
+        .text(function(d) {
+          var title = "";
+          switch (d.x) {
+            case "count":
+              title = "Average Children per Cohort";
+              break;
+            case "childincome":
+              title = "Median Child Individual Earnings";
+              break;
+            case "parentincome":
+              title = "Median Parent HouseHold Income";
+              break;
+            case "mobility":
+              title = "Mobility Rate";
+              break;
+            case "uppertailmobility":
+              title = "Upper-tail Mobility Rate";
+              break;
+            default:
+              break;
+
+          }
+          return title;
+        });
+
+      cell.selectAll(".text")
+        .call(wrap, space.height);
+
+      cell.call(brush);
+
+      function plot(p) {
+        var cell = d3.select(this);
+
+        x.domain(domainByTrait[p.x]);
+        y.domain(domainByTrait[p.y]);
+
+        cell.append("rect")
+          .attr("class", "frame")
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", space.width)
+          .attr("height", space.height);
+
+        cell.selectAll("circle")
+          .data(data)
+          .enter().append("circle")
+          .attr("cx", function(d) {
+            return x(d[p.x]);
+          })
+          .attr("cy", function(d) {
+            return y(d[p.y]);
+          })
+          .attr("r", 3)
+          .style("fill", function(d) {
+            return color(d.type);
+          });
+      }
+
+      var brushCell;
+
+      // Clear the previously-active brush, if any.
+      function brushstart(p) {
+        if (brushCell !== this) {
+          d3.select(brushCell).call(brush.move, null);
+          brushCell = this;
+          x.domain(domainByTrait[p.x]);
+          y.domain(domainByTrait[p.y]);
+        }
+      }
+
+      // Highlight the selected circles.
+      function brushmove(p) {
+        var e = d3.brushSelection(this);
+        svg.selectAll("circle").classed("hidden", function(d) {
+          return !e ?
+            false :
+            (
+              e[0][0] > x(+d[p.x]) || x(+d[p.x]) > e[1][0] ||
+              e[0][1] > y(+d[p.y]) || y(+d[p.y]) > e[1][1]
+            );
+        });
+      }
+
+      // If the brush is empty, select all circles.
+      function brushend() {
+        var e = d3.brushSelection(this);
+        if (e === null) svg.selectAll(".hidden").classed("hidden", false);
+      }
+
+      var legendFullHeight = 100;
+      var legendFullWidth = 200;
+
+      var legendMargin = {
+        top: 20,
+        bottom: 20,
+        left: 20,
+        right: 20
+      };
+
+      var legendWidth = legendFullWidth - legendMargin.left - legendMargin.right;
+      var legendHeight = legendFullHeight - legendMargin.top - legendMargin.bottom;
+
+      var legendSvg = d3.select('#legend-svg')
+        .attr('width', legendFullWidth)
+        .attr('height', legendFullHeight)
+        .append('g')
+        .attr('transform', 'translate(' + legendMargin.left + ',' +
+          legendMargin.top + ')');
+
+      var legend = legendSvg.selectAll(".legend")
+        .data(fntypelookup(data))
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", function(d, i) {
+          return "translate(0," + i * 20 + ")";
+        });
+
+      legend.append("text")
+        .attr("x", legendWidth - 24)
+        .attr("y", "10")
+        .style("text-anchor", "end")
+        .text(function(d) {
+          return d[1];
+        });
+
+      legend.append("rect")
+        .attr("x", legendWidth - 18)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", function(d) {
+          return color(d[0]);
+        });
+
+      legendSvg.append("text")
+        .attr("class", "label")
+        .attr("x", legendWidth - 40)
+        .attr("y", "-10")
+        .attr("dy", ".15em")
+        .style("font-size", 14)
+        .text("Type");
+
+      function fntypelookup(data) {
+        let out = new Map();
+        d3.map(data, function(d) {
+          return d.type;
+        }).keys().sort(function(a, b) {
+          return a - b;
+        }).forEach((item, i) => {
+          switch (item) {
+            case "1":
+              out.set(item, "public");
+              break;
+            case "2":
+              out.set(item, "private non-profit");
+              break;
+            case "3":
+              out.set(item, "for-profit");
+              break;
+            default:
+              break;
+          }
+        });
+        return Array.from(out.entries());
+      }
+
+    }
+
+    function wrap(text, width) {
+      console.log(text);
+      text.each(function() {
+        var text = d3.select(this),
+          words = text.text().split(/\s+/).reverse(),
+          word,
+          line = [],
+          lineNumber = 0,
+          lineHeight = 1.1, // ems
+          y = text.attr("y"),
+          x = text.attr("x") ? text.attr("x") : 0,
+          dy = parseFloat(text.attr("dy")),
+          dx = parseFloat(text.attr("dx") ? text.attr("dx") : 0),
+          tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em")
+        while (word = words.pop()) {
+          line.push(word)
+          tspan.text(line.join(" "))
+          if (tspan.node().getComputedTextLength() > width) {
+            line.pop()
+            tspan.text(line.join(" "))
+            line = [word]
+            tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", `${++lineNumber * lineHeight + dy}em`)
+              .attr("dx", dx).text(word)
+          }
+        }
+      })
+    }
+
+    function cross(a, b) {
+
+      var c = [],
+        n = a.length,
+        m = b.length,
+        i, j;
+      for (i = -1; ++i < n;)
+        for (j = -1; ++j < m;) c.push({
+          x: a[i],
+          i: i,
+          y: b[j],
+          j: j
+        });
+      return c;
+    }
+
+    function countFormatter(d) {
+      var test = d;
+      if (d >= 1000) {
+        test = (d / 1000) + "K";
+      }
+      return test;
+    }
+  </script>
+
+</body>
